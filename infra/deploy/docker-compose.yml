@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  backend:
+    image: jjami-backend:latest
+    container_name: jjami-backend
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    container_name: jjamidb-redis
+    restart: always
+    ports:
+      - "6379:6379"
