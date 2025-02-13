@@ -2,6 +2,8 @@ version: "3.8"
 
 services:
   backend:
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
     image: "${DOCKER_USERNAME}/jjami-backend-app:latest"
     restart: always
     env_file:
