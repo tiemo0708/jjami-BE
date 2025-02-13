@@ -2,9 +2,10 @@ version: "3.8"
 
 services:
   backend:
-    build: .
+    build:
+      context: ../..
+      dockerfile: Dockerfile
     image: jjami-backend:latest
-    container_name: jjami-backend
     restart: always
     env_file:
       - .env
@@ -15,7 +16,6 @@ services:
 
   redis:
     image: redis:latest
-    container_name: jjamidb-redis
     restart: always
     ports:
       - "6379:6379"
