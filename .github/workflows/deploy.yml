@@ -30,6 +30,28 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/jjamidb-app .
           docker push ${{ secrets.DOCKER_USERNAME }}/jjamidb-app
 
+      # ✅ EC2로 `deploy.sh` 및 코드 전송
+      - name: Upload deploy.sh & App to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USER }}
+          key: ${{ secrets.AWS_PRIVATE_KEY }}
+          source: "infra/deploy/scripts/deploy.sh"
+          target: "/home/ubuntu/app"
+
+      # ✅ EC2에서 `deploy.sh` 실행
+      - name: Deploy to AWS Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USER }}
+          key: ${{ secrets.AWS_PRIVATE_KEY }}
+          script: |
+            cd /home/ubuntu/app
+            chmod +x deploy.sh
+            ./deploy.sh
+
       - name: Deploy to AWS Server
         uses: appleboy/ssh-action@master
         with:
