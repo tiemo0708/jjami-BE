@@ -1,7 +1,8 @@
-version: '3.8'
+version: "3.8"
 
 services:
   backend:
+    build: .
     image: jjami-backend:latest
     container_name: jjami-backend
     restart: always
