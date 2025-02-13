@@ -3,7 +3,7 @@
 echo "🚀 배포 시작: $(date)"
 
 # 프로젝트 디렉토리 이동
-cd /home/ubuntu/app || exit
+cd /home/ubuntu/app/infra/deploy || exit
 
 echo "🔄 최신 코드 가져오는 중..."
 git pull origin main
