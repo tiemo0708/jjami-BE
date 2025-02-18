@@ -2,19 +2,42 @@ version: "3.8"
 
 services:
   backend:
-    environment:
-      - SPRING_PROFILES_ACTIVE=prod
+    container_name: deploy-backend
     image: "${DOCKER_USERNAME}/jjami-backend-app:latest"
     restart: always
     env_file:
-      - .env
-    ports:
-      - "8080:8080"
+      - .env  # 환경 변수 관리 (DB 정보, JWT 등)
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
     depends_on:
       - redis
+    networks:
+      - jjami_network
+    expose:
+      - "8080"  # Nginx에서 접근할 포트
 
   redis:
+    container_name: deploy-redis
     image: redis:latest
     restart: always
     ports:
       - "6379:6379"
+    networks:
+      - jjami_network
+
+  nginx:
+    container_name: deploy-nginx
+    image: nginx:latest
+    restart: always
+    ports:
+      - "80:80"  # 외부에서 접속할 포트
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - backend
+    networks:
+      - jjami_network
+
+networks:
+  jjami_network:
+    driver: bridge
