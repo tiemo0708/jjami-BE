@@ -56,6 +56,15 @@ jobs:
           source: "infra/deploy/scripts/deploy.sh"
           target: "/home/ubuntu/app"
 
+      - name: Upload Nginx Config Files to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USER }}
+          key: ${{ secrets.AWS_PRIVATE_KEY }}
+          source: "infra/deploy/nginx/*"
+          target: "/home/ubuntu/app/infra/deploy/nginx"
+
       - name: Deploy to AWS Server
         uses: appleboy/ssh-action@master
         with:
