@@ -3,7 +3,7 @@ name: Deploy to AWS
 on:
   push:
     branches:
-      - main
+      - main  # main 브랜치에 푸시될 때 자동 배포
 
 jobs:
   build:
@@ -47,23 +47,14 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/jjami-backend-app:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/jjami-backend-app:latest
 
-      - name: Upload deploy.sh & App to EC2
+      - name: Upload Project Files to EC2  # 🔥 최신 코드 업로드
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.AWS_HOST }}
           username: ${{ secrets.AWS_USER }}
           key: ${{ secrets.AWS_PRIVATE_KEY }}
-          source: "infra/deploy/scripts/deploy.sh"
+          source: "."  # 🔥 프로젝트 전체를 업로드
           target: "/home/ubuntu/app"
-
-      - name: Upload Nginx Config Files to EC2
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.AWS_HOST }}
-          username: ${{ secrets.AWS_USER }}
-          key: ${{ secrets.AWS_PRIVATE_KEY }}
-          source: "infra/deploy/nginx/*"
-          target: "/home/ubuntu/app/infra/deploy/nginx"
 
       - name: Deploy to AWS Server
         uses: appleboy/ssh-action@master
@@ -72,6 +63,7 @@ jobs:
           username: ${{ secrets.AWS_USER }}
           key: ${{ secrets.AWS_PRIVATE_KEY }}
           script: |
-            cd /home/ubuntu/app/infra/deploy/scripts
-            chmod +x deploy.sh
-            ./deploy.sh
+            cd /home/ubuntu/app
+            git pull origin main  # 🔥 최신 코드 가져오기
+            chmod +x infra/deploy/scripts/deploy.sh
+            ./infra/deploy/scripts/deploy.sh  # 🔥 최신 코드 배포
