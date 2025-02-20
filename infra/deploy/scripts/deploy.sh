@@ -17,4 +17,10 @@ docker-compose up -d --force-recreate  # 최신 이미지로 컨테이너 재시
 echo "🧹 사용하지 않는 Docker 이미지 정리"
 docker image prune -f  # 불필요한 이미지 정리
 
+echo "🔄 Nginx 설정 반영 중..."
+docker exec deploy-nginx nginx -s reload  # 변경된 설정 반영
+
+echo "🔄 Certbot SSL 인증서 갱신 중..."
+docker exec deploy-certbot certbot renew --quiet  # SSL 자동 갱신
+
 echo "✅ 배포 완료!"
