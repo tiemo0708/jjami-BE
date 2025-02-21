@@ -47,7 +47,18 @@ jobs:
           docker build -t ${{ secrets.DOCKER_USERNAME }}/jjami-backend-app:latest .
           docker push ${{ secrets.DOCKER_USERNAME }}/jjami-backend-app:latest
 
-      - name: Upload Project Files to EC2  # 🔥 최신 코드 업로드
+      # ✅ Nginx 관련 설정 파일 업로드
+      - name: Upload Nginx Config Files to EC2
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.AWS_HOST }}
+          username: ${{ secrets.AWS_USER }}
+          key: ${{ secrets.AWS_PRIVATE_KEY }}
+          source: "infra/deploy/nginx/*"
+          target: "/home/ubuntu/app/infra/deploy/nginx"
+
+      # ✅ 전체 프로젝트 업로드 (이전에는 특정 파일만 업로드)
+      - name: Upload Project Files to EC2
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.AWS_HOST }}
@@ -56,6 +67,7 @@ jobs:
           source: "."  # 🔥 프로젝트 전체를 업로드
           target: "/home/ubuntu/app"
 
+      # ✅ EC2에서 배포 스크립트 실행
       - name: Deploy to AWS Server
         uses: appleboy/ssh-action@master
         with:
@@ -64,6 +76,5 @@ jobs:
           key: ${{ secrets.AWS_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/app
-            git pull origin main  # 🔥 최신 코드 가져오기
             chmod +x infra/deploy/scripts/deploy.sh
-            ./infra/deploy/scripts/deploy.sh  # 🔥 최신 코드 배포
+            ./infra/deploy/scripts/deploy.sh  # 🔥 최신 코드 및 Nginx 반영
